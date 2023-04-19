@@ -1,0 +1,212 @@
+---
+title: "Advanced Bioinformatics 2023 assessment"
+author: '2207337'
+date: "05/04/2023"
+output: html_document
+---
+rmarkdown::render('~/Downloads/LMS_RNAseq_short-master-2023-final/course/m2207337_Advanced_Bioinformatics.Rmd', output_format = 'html_document')
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+---
+General R/Rstudio assessment
+```{r}
+#3.1. Using the sum() function and : operator, write an expression in the code snippet to evaluate the sum of all integers between 5 and 55
+s<-c(5:55)
+sum(s)
+```
+
+```{r}
+#3.2. Write a function called sumfun with one input parameter, called n, that calculates the sum of all integers between 5 and n. Use the function to do the calculation for n = 10, n = 20, and n = 100 and present the results.
+sumfun<-function(n) {sum(5:n)}
+sumfun(10)
+sumfun(20)
+sumfun(100)
+```
+
+
+```{r}
+#3.3. The famous Fibonacci series is calculated as the sum of the two preceding members of the sequence, where the first two steps in the sequence are 1, 1. Write an R script using a for loop to calculate and print out the first 12 entries of the Fibonacci series. 
+n <- 12  #First the variable ‘n’ has been assigned to an integer 12
+fib <- numeric(n) # Next, the class numeric has been assigned to the variable ‘n’ which has been assigned to  the variable ‘fib’
+fib[1] <- 1 #the first two positions in the variable fib have been both assigned the value 1 since the first two steps in the Fibonacci sequence are 1, 1
+fib[2] <- 1
+for (i in 3:n) # a for loop has been used to create a loop which takes in a range of numbers from 3 to n. first 12 entries by taking in the position of the ith integer and then calculates the sum of the two integers before it.
+{
+   fib[i] <- fib[i-1]+fib[i-2]  
+}
+print(fib) # prints the values in variable fib
+```
+
+
+```{r}
+# With the mtcars dataset bundled with R, use ggplot to generate a box of miles per gallon (in the variable mpg) as a function of the number of gears (in the variable gear). Use the fill aesthetic to colour bars by number of gears.
+ggplot(data=mtcars, aes (x=gear , y=mpg, group=gear, fill=gear, ))+geom_boxplot()+ggtitle("Miles per gallon as function of number of gears")
+
+# using the package ggplot2.
+# data function takes in the dataset to be used
+#aes function takes in the variables from the dataset to be used to be mapped to their visual properties('x' and 'y'); the 'fill' paramter takes in the variable by which the colors are to be added.
+#ggtitle argument is used to create a title for the boxplot.
+
+```
+
+```{r}
+#3.5. Using the cars dataset and the function lm, fit a linear relationship between speed and breaking distance in the variable distance. What are the fitted slope and intercept of the line, and their standard errors? What are the units used for the variables in the dataset?
+x<-cars$speed # Assigning x to the values from speed variable in cars dataset
+y<-cars$dist # Assigning y to the values from dist variable in cars dataset
+l<-lm(y~x) # Using the lm function to create a linear model between
+summary(l)
+```
+
+```{r}
+#3.6. Use ggplot to plot the data points from Task 6 and the linear fit.
+ggplot(data=cars, aes(x=speed, y=dist)) + geom_point()+geom_smooth(method="lm", formula="y~x") +xlab("Speed(mph)") + ylab("Distance(ft)") + ggtitle("Linear model of breaking distance and speed")
+
+#ggplot has been used to create a plot based on the linear model which plots the data points from the variables speed and dist using geom_point(). 
+#geom_smooth() generates the linear fit line. method takes in the type of model to be used and formula takes in the variables to be used on which the model is to be created.
+# xlab to add label to x axis
+#ylab to add label to y axis
+#ggtitle to add title to the plot
+```
+
+
+```{r}
+#3.7. Again using the cars dataset, now use linear regression (lm) to estimate the average reaction time for the driver to start breaking (in seconds). To simplify matters you may assume that once breaking commences, breaking distance is proportional to the square of the speed. Explain the steps in your analysis. Do you get reasonable results? Finally, use ggplot to plot the data points and the fitted relationship.
+
+# speed is in miles per hour(mph) and distance is in feet
+# thus converting the distance from feet to miles (1 foot = 0.000189394 miles);
+dmiles<-cars$dist*0.000189394 
+
+#Assuming that breaking distance is proportional to the square of the speed;
+z<-cars$speed^2
+
+# model for relationship between square of speed and breaking distance(in miles)
+l<-lm(dmiles~z)
+summary(l)
+
+ggplot(data=cars, aes(x=z, y=dmiles)) + geom_point()+ geom_smooth(method="lm", formula="y~x")+xlab("Speed (mph)")+ylab("Distance(miles)")
+
+
+#speed=distance/time
+#Thus in, y=mx+c
+#distance = speed*time + c
+#thus,based on the above relation m, which is the slope is time.
+# thus, based on the model, the slope (m) = 2.443e-05 = time
+# converting time from hour to seconds (1 hr= 3600 seconds);
+reaction_time <- 2.443e-05*3600
+reaction_time
+
+```
+
+
+```{r}
+#3.8. Read in count data and sample description
+#Reading the counts file to a variable exercise
+exercise <- read.csv(file = "~/Downloads/LMS_RNAseq_short-master-2023-final/course/exercises/data/exercise1_counts.csv", row.names=1)
+
+#Reading the info file to a variable sampleinfo
+sampleinfo<-read.csv(file = "~/Downloads/LMS_RNAseq_short-master-2023-final/course/exercises/data/exercise1_sample_description.info", sep = "\t", header=TRUE)
+```
+
+```{r}
+#3.9. Create col_data and check dimensions
+
+#Using the data.frame function, generating a dataframe which inludes the sample, conditions and batch fields.
+col_data<-data.frame(Sample= sampleinfo$sample, Condition= sampleinfo$condition,Batch = sampleinfo$batch)
+
+
+# assigning the class factor to all the variables.
+col_data$Sample <- as.factor(col_data$Sample)
+col_data$Condition <- as.factor(col_data$Condition)
+col_data$Batch <- as.factor(col_data$Batch)
+
+
+# Check dimensions
+#using the all() function and equality operator checking that whether all the number of fields in the dataset excercise equal to number of fields in
+all(colnames(exercise)==sampleinfo$sample)
+```
+
+```{r}
+#3.10 Construct DESeqDataSet object using count data and sample description
+library("DESeq2")
+Deseqds <- DESeqDataSetFromMatrix(countData = exercise, 
+                              colData = col_data, 
+                              design = ~Condition)
+
+#deseq normalisation performed
+Deseqds <- DESeq(Deseqds)
+```
+
+
+
+
+
+```{r}
+#3.11. Perform rlog and VST transformation on the data
+# rlog function from the DESeq2 package used to perform rlog transformation on the normalised data
+rlg <- rlog(Deseqds)
+
+#varianceStabilizingTransformation function from the DESeq2 package used to perform vst transformation on the normalised data.
+vst <- varianceStabilizingTransformation(Deseqds)
+```
+
+```{r}
+#3.12. Draw a heatmap of count matrix based on the top 40 highly expressed genes using rlog and VST data
+library("pheatmap")
+
+# Obtaining rlog and vst data in the count format using the assay function
+rlg_counts <- assay(rlg)
+vst_counts <- assay(vst)
+
+#Using  counts function to get the counts of the DESeqdataset object. USing the input normalized=TRUE to divide the counts by the normalisation factors.
+dsq_counts <- counts(Deseqds, normalized = TRUE)
+
+#Using the rowMeans function ot obtain means of each row in the dsq_counts and sorting the top 40 them in an increasing order.
+select <- order(rowMeans(dsq_counts), decreasing = TRUE)[1:40]
+
+#Plotting the heatmap for rlog and vst data only for the top 40 genes based on the mean countusing pheatmap.
+pheatmap(assay(rlg)[select, ])
+pheatmap(assay(vst)[select, ])
+```
+
+```{r}
+#3.13. Generate a SDM to see the clustering of count data. (1 pts)
+
+# Using the dist function to obtain a distance matrix on the rlog data (rlg)
+sd <- dist(t(assay(rlg)))
+
+#Changing the class of the distance matrix to matrix using as.matrix
+sdm <- as.matrix(sd)
+
+library("RColorBrewer")
+
+#Setting the row names in the sdm matrix as the condition variable from the rlog data and null for column names so that it is empty.
+rownames(sdm) <- rlg$Condition
+colnames(sdm) <- NULL
+
+#Using pheatmap to construct a heatmap using the sample distance matrix (sdm).
+#Assigning the distance values to rows and columns for clustering from the previously created distance data 
+#The col paramter is used to take in colors from the colorRampPalette and brewer.pal function.
+pheatmap(sdm,
+         clustering_distance_rows = sd,
+         clustering_distance_cols = sd,
+         col = colorRampPalette(rev(brewer.pal(9, "Reds")))(255))
+```
+
+```{r}
+#3.14. Perform the Principal Component Analysis using rlog method and find out the % significance values of first two principal components. (1 pts)
+rlgplot<-plotPCA(rlg, intgroup = "Condition")
+```
+
+```{r}
+#3.15. Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method. (1 pts)
+vstplot<-plotPCA(vst, intgroup = "Condition")
